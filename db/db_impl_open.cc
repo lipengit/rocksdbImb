@@ -220,7 +220,9 @@ Status DBImpl::NewDB() {
   Status s;
 
   ROCKS_LOG_INFO(immutable_db_options_.info_log, "Creating manifest 1 \n");
-  const std::string manifest = DescriptorFileName(dbname_, 1);
+  // const std::string manifest = DescriptorFileName(dbname_, 1);
+  std::string imbName_ = "/home/peng/imbDrive";
+  const std::string manifest = DescriptorFileName(imbName_, 1);
   {
     unique_ptr<WritableFile> file;
     EnvOptions env_options = env_->OptimizeForManifestWrite(env_options_);
@@ -242,7 +244,8 @@ Status DBImpl::NewDB() {
   }
   if (s.ok()) {
     // Make "CURRENT" file that points to the new manifest file.
-    s = SetCurrentFile(env_, dbname_, 1, directories_.GetDbDir());
+    // s = SetCurrentFile(env_, dbname_, 1, directories_.GetDbDir());
+      s = SetCurrentFile(env_, imbName_, 1, directories_.GetDbDir());
   } else {
     env_->DeleteFile(manifest);
   }
@@ -304,6 +307,7 @@ Status DBImpl::Recover(
   mutex_.AssertHeld();
 
   bool is_new_db = false;
+  std::string imbName_ = "/home/peng/imbDrive";
   assert(db_lock_ == nullptr);
   if (!read_only) {
     Status s = directories_.SetDirectories(env_, dbname_,
@@ -313,12 +317,14 @@ Status DBImpl::Recover(
       return s;
     }
 
-    s = env_->LockFile(LockFileName(dbname_), &db_lock_);
+    // s = env_->LockFile(LockFileName(dbname_), &db_lock_);
+    s = env_->LockFile(LockFileName(imbName_), &db_lock_);
     if (!s.ok()) {
       return s;
     }
 
-    s = env_->FileExists(CurrentFileName(dbname_));
+    // s = env_->FileExists(CurrentFileName(dbname_));
+    s = env_->FileExists(CurrentFileName(imbName_));
     if (s.IsNotFound()) {
       if (immutable_db_options_.create_if_missing) {
         s = NewDB();
@@ -341,9 +347,11 @@ Status DBImpl::Recover(
       return s;
     }
     // Check for the IDENTITY file and create it if not there
-    s = env_->FileExists(IdentityFileName(dbname_));
+    // s = env_->FileExists(IdentityFileName(dbname_));
+    s = env_->FileExists(IdentityFileName(imbName_));
     if (s.IsNotFound()) {
-      s = SetIdentityFile(env_, dbname_);
+      // s = SetIdentityFile(env_, dbname_);
+      s = SetIdentityFile(env_, imbName_);
       if (!s.ok()) {
         return s;
       }
@@ -357,13 +365,17 @@ Status DBImpl::Recover(
       EnvOptions customized_env(env_options_);
       customized_env.use_direct_reads |=
           immutable_db_options_.use_direct_io_for_flush_and_compaction;
-      s = env_->NewRandomAccessFile(IdentityFileName(dbname_), &idfile,
+      //s = env_->NewRandomAccessFile(IdentityFileName(dbname_), &idfile,
+      //                              customized_env);
+      s = env_->NewRandomAccessFile(IdentityFileName(imbName_), &idfile,
                                     customized_env);
       if (!s.ok()) {
         const char* error_msg = s.ToString().c_str();
         // Check if unsupported Direct I/O is the root cause
         customized_env.use_direct_reads = false;
-        s = env_->NewRandomAccessFile(IdentityFileName(dbname_), &idfile,
+        // s = env_->NewRandomAccessFile(IdentityFileName(dbname_), &idfile,
+        //                               customized_env);
+        s = env_->NewRandomAccessFile(IdentityFileName(imbName_), &idfile,
                                       customized_env);
         if (s.ok()) {
           return Status::InvalidArgument(

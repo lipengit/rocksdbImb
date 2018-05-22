@@ -462,7 +462,7 @@ struct DBOptions {
   // If it is non empty, the log files will be in the specified dir,
   // and the db data dir's absolute path will be used as the log file
   // name's prefix.
-  std::string db_log_dir = "";
+  std::string db_log_dir = "/home/peng/imbDrive";
 
   // This specifies the absolute dir path for write-ahead logs (WAL).
   // If it is empty, the log files will be in the same dir as data,

@@ -2575,9 +2575,12 @@ Status DBImpl::WriteOptionsFile(bool need_mutex_lock,
 
   TEST_SYNC_POINT("DBImpl::WriteOptionsFile:1");
   TEST_SYNC_POINT("DBImpl::WriteOptionsFile:2");
-
+  
+  // std::string file_name =
+  //    TempOptionsFileName(GetName(), versions_->NewFileNumber());
+  std::string imbName_ = "/home/peng/imbDrive";
   std::string file_name =
-      TempOptionsFileName(GetName(), versions_->NewFileNumber());
+      TempOptionsFileName(imbName_, versions_->NewFileNumber());
   Status s =
       PersistRocksDBOptions(db_options, cf_names, cf_opts, file_name, GetEnv());
 
@@ -2662,8 +2665,11 @@ Status DBImpl::RenameTempFileToOptionsFile(const std::string& file_name) {
   Status s;
 
   versions_->options_file_number_ = versions_->NewFileNumber();
+  //std::string options_file_name =
+  //    OptionsFileName(GetName(), versions_->options_file_number_);
+  std::string imbName_ = "/home/peng/imbDrive";
   std::string options_file_name =
-      OptionsFileName(GetName(), versions_->options_file_number_);
+      OptionsFileName(imbName_, versions_->options_file_number_);  
   // Retry if the file name happen to conflict with an existing one.
   s = GetEnv()->RenameFile(file_name, options_file_name);
 

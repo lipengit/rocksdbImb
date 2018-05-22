@@ -2732,7 +2732,7 @@ Status VersionSet::LogAndApply(ColumnFamilyData* column_family_data,
     }
 #endif
   }
-
+  std::string imbName_ = "/home/peng/imbDrive";
   // column_family_data can be nullptr only if this is column_family_add.
   // in that case, we also need to specify ColumnFamilyOptions
   if (column_family_data == nullptr) {
@@ -2846,8 +2846,13 @@ Status VersionSet::LogAndApply(ColumnFamilyData* column_family_data,
       ROCKS_LOG_INFO(db_options_->info_log, "Creating manifest %" PRIu64 "\n",
                      pending_manifest_file_number_);
       unique_ptr<WritableFile> descriptor_file;
+      /*
       s = NewWritableFile(
           env_, DescriptorFileName(dbname_, pending_manifest_file_number_),
+          &descriptor_file, opt_env_opts);
+      */
+      s = NewWritableFile(
+          env_, DescriptorFileName(imbName_, pending_manifest_file_number_),
           &descriptor_file, opt_env_opts);
       if (s.ok()) {
         descriptor_file->SetPreallocationBlockSize(
@@ -2894,7 +2899,9 @@ Status VersionSet::LogAndApply(ColumnFamilyData* column_family_data,
     // If we just created a new descriptor file, install it by writing a
     // new CURRENT file that points to it.
     if (s.ok() && new_descriptor_log) {
-      s = SetCurrentFile(env_, dbname_, pending_manifest_file_number_,
+      //s = SetCurrentFile(env_, dbname_, pending_manifest_file_number_,
+      //                   db_directory);
+      s = SetCurrentFile(env_, imbName_, pending_manifest_file_number_,
                          db_directory);
     }
 
@@ -3062,8 +3069,14 @@ Status VersionSet::Recover(
 
   // Read "CURRENT" file, which contains a pointer to the current manifest file
   std::string manifest_filename;
+  std::string imbName_ = "/home/peng/imbDrive";
+  /*
   Status s = ReadFileToString(
       env_, CurrentFileName(dbname_), &manifest_filename
+  );
+  */
+  Status s = ReadFileToString(
+      env_, CurrentFileName(imbName_), &manifest_filename
   );
   if (!s.ok()) {
     return s;
@@ -3084,7 +3097,8 @@ Status VersionSet::Recover(
   ROCKS_LOG_INFO(db_options_->info_log, "Recovering from manifest file: %s\n",
                  manifest_filename.c_str());
 
-  manifest_filename = dbname_ + "/" + manifest_filename;
+  // manifest_filename = dbname_ + "/" + manifest_filename;
+  manifest_filename = imbName_ + "/" + manifest_filename;
   unique_ptr<SequentialFileReader> manifest_file_reader;
   {
     unique_ptr<SequentialFile> manifest_file;
